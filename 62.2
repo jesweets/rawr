@@ -1,0 +1,40 @@
+yA = c(8,7,9,13,10)
+yB = c(14,16,12,17,11)
+yC = c(10,12,16,15,12)
+anova.y = c(yA,yB,yC)
+anova.y
+grp <- c(rep('A',5), rep('B',5), rep('C',5))
+anova.data <- cbind(anova.y, grp)
+anova.data
+
+#Built-in
+anova.dataframe <- data.frame(anova.y, factor(grp))
+colnames(anova.dataframe) <- c('y', 'groups')
+anova.dataframe
+data.aov <- aov(y~groups, data = anova.dataframe)
+summary(data.aov)
+
+#Manual
+anova.C <- matrix(c(0,1,-1,0,0,1,0,-1), nrow = 2, byrow = T)
+anova.C
+k <- 3
+n <- length(yA)
+df1 <- k-1
+df2 <- k*(n-1)
+x0 <- rep(1, k*n)
+x1 <- diag(1, nrow = 3)[rep(c(1:3), each = 5),]
+x <- cbind(x0, x1)
+x
+XTX <- t(x)%*%x
+XTy <- t(x)%*%anova.y
+XTXi <- diag(1/n, 4)
+XTXi[1,1] <- 0
+beta.hat <- XTXi%*%XTy
+SSE <- t(anova.y)%*%anova.y-t(beta.hat)%*%XTy
+s2 <- SSE/df2
+Fnum <- t(anova.C%*%beta.hat)%*%solve(anova.C%*%XTXi%*%t(anova.C))%*%(anova.C%*%beta.hat)
+Fdenom <- SSE
+Fstatanova <- (Fnum/df1)/(Fdenom/df2)
+Fstatanova
+
+
